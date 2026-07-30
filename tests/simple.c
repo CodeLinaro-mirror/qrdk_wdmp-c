@@ -1367,6 +1367,67 @@ void set_res_form()
 	}
 }
 
+void method_res_form()
+{
+        res_struct *resObj = NULL;
+        cJSON *response = NULL;
+        cJSON *paramArray = NULL, *resParamObj = NULL;
+        WDMP_RESPONSE_STATUS_CODE statusCode;
+
+        WdmpInfo("\n***************************************************** \n\n");
+
+        response = cJSON_CreateObject();
+
+        resObj = (res_struct *) malloc(sizeof(res_struct));
+        memset(resObj, 0, sizeof(res_struct));
+
+        resObj->reqType = METHOD;
+        resObj->paramCnt = 1;
+
+        resObj->u.paramRes = (param_res_t *) malloc(sizeof(param_res_t));
+        memset(resObj->u.paramRes, 0, sizeof(param_res_t));
+
+        resObj->u.paramRes->params = (param_t *) malloc(sizeof(param_t));
+        memset(resObj->u.paramRes->params, 0, sizeof(param_t));
+
+        resObj->u.paramRes->params[0].name = (char *) malloc(sizeof(char) * MAX_PARAM_LEN);
+        resObj->u.paramRes->params[0].value = (char *) malloc(sizeof(char) * MAX_PARAM_LEN);
+        strcpy(resObj->u.paramRes->params[0].name, "Device.X_RDK_WebConfig.MethodOutput");
+        strcpy(resObj->u.paramRes->params[0].value, "VGVzdE1ldGhvZFJlc3BvbnNl");
+        resObj->u.paramRes->params[0].type = WDMP_BASE64;
+
+        resObj->timeSpan = NULL;
+
+        resObj->retStatus = (WDMP_STATUS *) malloc(sizeof(WDMP_STATUS));
+        resObj->retStatus[0] = WDMP_SUCCESS;
+
+        wdmp_form_set_response(resObj, response);
+
+        CU_ASSERT( NULL != response);
+
+        getStatusCode(&statusCode, (int)resObj->paramCnt, resObj->retStatus);
+        CU_ASSERT_EQUAL((int)statusCode, cJSON_GetObjectItem(response, "statusCode")->valueint);
+
+        paramArray = cJSON_GetObjectItem(response, "parameters");
+        CU_ASSERT( NULL != paramArray );
+        CU_ASSERT_EQUAL( (int)resObj->paramCnt, cJSON_GetArraySize(paramArray) );
+
+        resParamObj = cJSON_GetArrayItem(paramArray, 0);
+        CU_ASSERT( NULL != resParamObj );
+        CU_ASSERT_STRING_EQUAL(resObj->u.paramRes->params[0].name, cJSON_GetObjectItem(resParamObj, "name")->valuestring);
+        CU_ASSERT_STRING_EQUAL(resObj->u.paramRes->params[0].value, cJSON_GetObjectItem(resParamObj, "message")->valuestring);
+
+        if(NULL != resObj)
+        {
+                wdmp_free_res_struct(resObj);
+        }
+
+        if(response != NULL)
+	{
+		cJSON_Delete(response);
+	}
+}
+
 void set_attr_res_form()
 {
         res_struct *resObj = NULL;
@@ -2573,6 +2634,7 @@ void add_response_form_suites ( CU_pSuite *suite )
     CU_add_test( *suite, "Get wild card Response Form", test_wdmp_form_response_negative );
     CU_add_test( *suite, "Get attributes Response Form", get_attr_res_form );
     CU_add_test( *suite, "Set Response Form", set_res_form );
+        CU_add_test( *suite, "Method Response Form", method_res_form );
     CU_add_test( *suite, "Set attributes Response Form", set_attr_res_form );
     CU_add_test( *suite, "Test and Set Response Form", test_and_set_res_form );
     CU_add_test( *suite, "Add row Response Form", add_rows_res_form );

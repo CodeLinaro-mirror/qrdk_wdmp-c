@@ -177,6 +177,7 @@ void wdmp_form_response(res_struct *resObj, char **payload)
                         
                         case SET:
                         case SET_ATTRIBUTES:
+                        case METHOD:
                         {
 		                wdmp_form_set_response(resObj, response);
                         }
@@ -377,6 +378,7 @@ void wdmp_free_res_struct( res_struct *resObj )
                 case SET:
                 case SET_ATTRIBUTES:
                 case TEST_AND_SET:
+                case METHOD:
                 {
                         if(resObj->u.paramRes)
                         {

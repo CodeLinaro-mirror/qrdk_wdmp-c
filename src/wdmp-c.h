@@ -102,7 +102,8 @@ typedef enum
     TEST_AND_SET,
     REPLACE_ROWS,
     ADD_ROWS,
-    DELETE_ROW
+    DELETE_ROW,
+    METHOD
 } REQ_TYPE;
 
 typedef struct

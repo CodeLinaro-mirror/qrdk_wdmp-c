@@ -558,10 +558,22 @@ void wdmp_form_get_response(res_struct *resObj, cJSON *response)
                         
                         WdmpPrint("resObj->u.paramRes->params[%zu].name :%s\n",i,resObj->u.paramRes->params[i].name);
                         cJSON_AddStringToObject(resParamObj, "name", resObj->u.paramRes->params[i].name);
-                        
+                        if((resObj->reqType == METHOD) && (resObj->u.paramRes->params[i].type == WDMP_BASE64))
+						{
+							if(result)
+							{
+									free(result);
+									result = NULL;
+							}
+							result = strdup(resObj->u.paramRes->params[i].value);
+							cJSON_AddStringToObject(resParamObj, "message", result);
+						}
+						else
+						{
                         WdmpPrint("resObj->retStatus[%zu] : %d\n",i,resObj->retStatus[i]);
                         mapWdmpStatusToStatusMessage(resObj->retStatus[i], result);
                         cJSON_AddStringToObject(resParamObj, "message", result);
+						}
                 }
                 
         }
